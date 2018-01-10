@@ -46,6 +46,19 @@ app.post('/todos', (req, res) => {
     
 });
 
+app.delete('/todos/:id', (req, res) => {
+    var todoId = parseInt(req.params.id, 10);
+    var matchedTodo = _.findWhere(todos, {id: todoId});
+
+    if(matchedTodo) {
+        todos = _.without(todos, matchedTodo);
+        res.json(todos);
+    }
+    else {
+        res.status(404).json({"Error": "No TODO item Found"});
+    }
+});
+
 app.listen(PORT, function() {
     console.log("TODO Express app is running on Port: " + PORT);
 });
