@@ -1,5 +1,4 @@
 var express = require('express');
-var env = process.env.NODE_ENV || 'development';
 var bodyParser = require('body-parser');
 var _ = require('underscore');
 var db = require('./database.js');
@@ -70,16 +69,30 @@ app.post('/todos', (req, res) => {
 
 app.delete('/todos/:id', (req, res) => {
     var todoId = parseInt(req.params.id, 10);
-    var matchedTodo = _.findWhere(todos, {id: todoId});
 
-    if(matchedTodo) {
-        todos = _.without(todos, matchedTodo);
-        res.json(todos);
-    }
-    else {
-        res.status(404).json({"Error": "No TODO item Found"});
-    }
+    db.todo.destroy({
+        where: {
+            id: todoId
+        }
+    }).then(function (rowsDeleted){
+        if(rowsDeleted === 0) {
+            res.status(404).json({
+                error: 'No TODO item with the given ID of ' + todoId + ' found'
+            })
+        } else {
+            res.status(204).send();
+        }    
+    }).catch(function(e){
+        res.status(500).json(e);
+    });
 });
+    // if(matchedTodo) {
+    //     todos = _.without(todos, matchedTodo);
+    //     res.json(todos);
+    // }
+    // else {
+    //     res.status(404).json({"Error": "No TODO item Found"});
+    // }
 
 app.put('/todos/:id', (req, res) => {
 	var todoId = parseInt(req.params.id, 10);
