@@ -13,7 +13,7 @@ var todoNextId = 1;
 app.use(bodyParser.json());
 
 app.get('/', function (req, res) {
-    res.send('To Do api Root!');
+    res.send('ToDo API Root!');
 });
 
 app.get('/todos', (req, res) => {
@@ -77,7 +77,7 @@ app.delete('/todos/:id', (req, res) => {
     }).then(function (rowsDeleted){
         if(rowsDeleted === 0) {
             res.status(404).json({
-                error: 'No TODO item with the given ID of ' + todoId + ' found'
+                error: 'No ToDo item with the given ID of ' + todoId + ' found'
             })
         } else {
             res.status(204).send();
@@ -115,19 +115,18 @@ app.put('/todos/:id', (req, res) => {
     })
 });
 
-app.post('/users', (req, res) => {
-    var body = _.pick(req.body, 'email','password');
-    
-    db.user.create(body).then(function (user){
-        res.json(user.toJSON());
-    }, function(e) {
-        res.status(404).json(e);
-    });
-    
+app.post('/users', function (req, res) {
+	var body = _.pick(req.body, 'email', 'password');
+
+	db.user.create(body).then(function (user) {
+		res.json(user.toPublicJSON());
+	}, function (e) {
+		res.status(400).json(e);
+	});
 });
 
-db.sequelize.sync().then(function () {
-    app.listen(PORT, function() {
-        console.log("TODO Express app is running on Port: " + PORT);
-    });
+db.sequelize.sync().then(function() {
+	app.listen(PORT, function() {
+		console.log('Express listening on port ' + PORT + '!');
+	});
 });
