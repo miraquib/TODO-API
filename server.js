@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var _ = require('underscore');
+var db = require('./database.js');
 
 
 var app = express();
@@ -54,14 +55,24 @@ app.get(`/todos/:id`, (req, res) => {
 app.post('/todos', (req, res) => {
     var body = _.pick(req.body, 'description','completed','id');
     
-    if(!_.isBoolean(body.completed) ||!_.isString(body.description) || body.description.trim().length=== 0) {
-        return res.status(400).send();
-    }
+    // call db.todo
+    //  respond with 200 and todo
+    //  or else respond 404 and error message
+
+    db.todo.create(body).then(function (todo){
+        res.json(todo.toJSON());
+    }, function(e) {
+        res.status(404).json(e);
+    });
     
-    body.description = body.description.trim();
-    body.id = todoNextId++;
-    todos.push(body);
-    res.json(body);
+    // if(!_.isBoolean(body.completed) ||!_.isString(body.description) || body.description.trim().length=== 0) {
+    //     return res.status(400).send();
+    // }
+    
+    // body.description = body.description.trim();
+    // body.id = todoNextId++;
+    // todos.push(body);
+    // res.json(body);
     
 });
 
@@ -104,6 +115,8 @@ app.put('/todos/:id', (req, res) => {
 	res.json(matchedTodo);
 });
 
-app.listen(PORT, function() {
-    console.log("TODO Express app is running on Port: " + PORT);
+db.sequelize.sync().then(function () {
+    app.listen(PORT, function() {
+        console.log("TODO Express app is running on Port: " + PORT);
+    });
 });
