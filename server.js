@@ -1,4 +1,5 @@
 var express = require('express');
+var env = process.env.NODE_ENV || 'development';
 var bodyParser = require('body-parser');
 var _ = require('underscore');
 var db = require('./database.js');
@@ -38,46 +39,6 @@ app.get('/todos', (req, res) => {
     }, function(e) {
         res.status(500).send();
     })
-
-
-
-    // if(query.hasOwnProperty('q') && query.q.length > 0) {
-    //     db.todo.findAll({
-    //         where: {
-    //             description:  {
-    //                 $like: `%${}%`
-    //             }
-    //         }
-    //     }).then(function(todos) {
-    //         if(todos) {
-    //             todos.forEach(function(todo){
-    //                 console.log(todo.toJSON());
-    //                 res.status(200).json(todo.toJSON());
-    //             })
-    //         } else {
-    //             console.log("No TODO items")
-    //         }
-    //     }).catch(function(e) {
-    //         res.status(404).send();
-    //     })
-    // }
-
-    // if(queryParam.hasOwnProperty('completed') && queryParam.completed === 'true') {
-    //     filteredTodos = _.where(filteredTodos, {completed: true});
-    //     res.json(filteredTodos);
-    // } 
-    // else if(queryParam.hasOwnProperty('completed') && queryParam.completed === 'false') {
-    //     filteredTodos = _.where(filteredTodos, {completed: false});
-    //     res.json(filteredTodos);
-    // } 
-
-    // if(queryParam.hasOwnProperty('q') && queryParam.q.length > 0) {
-    //     filteredTodos = _.filter(filteredTodos,function(todo) {
-    //         return todo.description.toLowerCase().indexOf(queryParam.q.toLowerCase()) > -1;
-    //     });
-    // } 
-
-    // res.json(todos);
 });
 
 app.get(`/todos/:id`, (req, res) => {
@@ -99,24 +60,11 @@ app.get(`/todos/:id`, (req, res) => {
 app.post('/todos', (req, res) => {
     var body = _.pick(req.body, 'description','completed','id');
     
-    // call db.todo
-    //  respond with 200 and todo
-    //  or else respond 404 and error message
-
     db.todo.create(body).then(function (todo){
         res.json(todo.toJSON());
     }, function(e) {
         res.status(404).json(e);
     });
-    
-    // if(!_.isBoolean(body.completed) ||!_.isString(body.description) || body.description.trim().length=== 0) {
-    //     return res.status(400).send();
-    // }
-    
-    // body.description = body.description.trim();
-    // body.id = todoNextId++;
-    // todos.push(body);
-    // res.json(body);
     
 });
 
